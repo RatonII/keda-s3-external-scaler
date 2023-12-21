@@ -99,10 +99,13 @@ func getS3ObjectsCount(s3BucketName string) (int, error) {
 	}
 	// Using the Config value, create the DynamoDB client
 	s3Client := s3.NewFromConfig(cfg)
-	attr, _ := s3Client.ListObjects(context.Background(), &s3.ListObjectsInput{
+	attr, err := s3Client.ListObjects(context.Background(), &s3.ListObjectsInput{
 		Bucket:              &s3BucketName,
 		ExpectedBucketOwner: nil,
 	})
+	if err != nil {
+		log.Fatalf("unable to get s3 list of objects, %v", err)
+	}
 	return int(len(attr.Contents)), nil
 }
 
@@ -148,7 +151,7 @@ func main() {
 	lis, _ := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	pb.RegisterExternalScalerServer(grpcServer, &ExternalScaler{})
 
-	fmt.Printf("listenting on :%s", grpcPort)
+	fmt.Printf("listening on :%s", grpcPort)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
