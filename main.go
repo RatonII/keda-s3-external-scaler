@@ -128,7 +128,7 @@ func (e *ExternalScaler) StreamIsActive(scaledObject *pb.ScaledObjectRef, epsSer
 		case <-epsServer.Context().Done():
 			// call cancelled
 			return nil
-		case <-time.Tick(time.Minute * 2):
+		case <-time.Tick(time.Second * 30):
 			s3ObjectsCount, err := getS3ObjectsCount(s3BucketName)
 			if err != nil {
 				// log error
