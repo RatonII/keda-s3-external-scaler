@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"os"
 	"strconv"
 	"time"
 
@@ -140,10 +141,14 @@ func (e *ExternalScaler) StreamIsActive(scaledObject *pb.ScaledObjectRef, epsSer
 
 func main() {
 	grpcServer := grpc.NewServer()
-	lis, _ := net.Listen("tcp", ":6000")
+	grpcPort := "6000"
+	if os.Getenv("PORT") != "" {
+		grpcPort = os.Getenv("PORT")
+	}
+	lis, _ := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	pb.RegisterExternalScalerServer(grpcServer, &ExternalScaler{})
 
-	fmt.Println("listenting on :6000")
+	fmt.Printf("listenting on :%s", grpcPort)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
